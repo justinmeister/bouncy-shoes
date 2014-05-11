@@ -1,0 +1,14 @@
+#COLORS
+
+BLACK =  0, 0, 0
+WHITE = 255, 255, 255
+
+#GAME STATES
+LEVEL1 = 'level1'
+MAIN_MENU = 'main menu'
+
+#LEVEL STATES
+NORMAL = 'normal'
+
+#FONTS
+MAIN_FONT = 'DroidSans'
