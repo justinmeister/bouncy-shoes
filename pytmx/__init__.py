@@ -1,6 +1,6 @@
-from data.pytmx.tmxloader import load_pygame, load_tmx
-from data.pytmx.utils import buildDistributionRects
-from data.pytmx.pytmx import *
+from tmxloader import load_pygame, load_tmx
+from utils import buildDistributionRects
+from pytmx import *
 
 __version__ = '2.16.4'
 __author__ = 'bitcraft'

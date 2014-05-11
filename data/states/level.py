@@ -4,6 +4,7 @@ State for levels.
 import pygame as pg
 from .. import tools, setup, tilerender, collision
 from .. import constants as c
+from ..sprites import player
 
 
 class Level(tools._State):
@@ -47,10 +48,10 @@ class Level(tools._State):
         return pg.Surface(size).convert()
 
     def make_player(self):
-        return None
+        return player.Player()
 
     def make_sprites(self):
-        return None
+        return pg.sprite.Group()
 
     def make_state_dict(self):
         """

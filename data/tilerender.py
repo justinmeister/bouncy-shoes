@@ -3,7 +3,7 @@ Module used to render tmx maps
 """
 
 import pygame as pg
-from .. import pytmx
+import pytmx
 
 
 class Renderer(object):

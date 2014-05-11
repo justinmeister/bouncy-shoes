@@ -1,8 +1,7 @@
 from itertools import chain, product
 from xml.etree import ElementTree
-
 from .utils import decode_gid, types, parse_properties, read_points
-
+from .constants import *
 
 __all__ = ['TiledMap', 'TiledTileset', 'TiledLayer', 'TiledObject', 'TiledObjectGroup', 'TiledImageLayer']
 
@@ -494,7 +493,7 @@ class TiledLayer(TiledElement):
         """
         parse a layer element
         """
-        from data.pytmx.utils import group
+        from utils import group
         from itertools import product, imap
         from struct import unpack
         import array
