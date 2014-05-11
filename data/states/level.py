@@ -2,8 +2,9 @@
 State for levels.
 """
 import pygame as pg
-from .. import tools, setup, tilerender
+from .. import tools, setup, tilerender, collision
 from .. import constants as c
+
 
 class Level(tools._State):
     def __init__(self, name):
@@ -16,7 +17,7 @@ class Level(tools._State):
         self.current_time = current_time
         self.state = c.NORMAL
         self.renderer = tilerender.Renderer(self.tmx_map)
-        self.map_image = self.renderer.make_2x_map()
+        self.map_image = self.renderer.make_map()
 
         self.viewport = self.make_viewport(self.map_image)
         self.level_surface = self.make_level_surface(self.map_image)
@@ -92,7 +93,7 @@ class Level(tools._State):
         self.level_surface.blit(self.player.image, self.player.rect)
         self.sprites.draw(self.level_surface)
         surface.blit(self.level_surface, (0, 0), self.viewport)
-        
+
 
 
 
