@@ -11,7 +11,7 @@ class Player(pg.sprite.Sprite):
     """
     User controlled player.
     """
-    def __init__(self):
+    def __init__(self, x, y):
         super(Player, self).__init__()
         self.get_image = tools.get_image
         self.state_dict = self.make_state_dict()
@@ -24,8 +24,10 @@ class Player(pg.sprite.Sprite):
         self.direction = c.RIGHT
         self.x_vel = 0
         self.y_vel = 0
+        self.max_speed = c.WALK_SPEED
+        self.allow_jump = False
         self.image = self.standing_image_dict[self.direction]
-        self.rect = self.image.get_rect(y=535)
+        self.rect = self.image.get_rect(x=x, bottom=y)
 
     def make_state_dict(self):
         """
@@ -33,7 +35,7 @@ class Player(pg.sprite.Sprite):
         """
         state_dict = {c.STANDING: self.standing,
                       c.WALKING: self.walking,
-                      c.JUMPING: self.jumping}
+                      c.FREE_FALL: self.free_fall}
         return state_dict
 
     def standing(self, keys, current_time, dt):
@@ -52,8 +54,11 @@ class Player(pg.sprite.Sprite):
             self.direction = c.LEFT
             self.state = c.WALKING
             self.timer = current_time
-        if keys[pg.K_SPACE]:
-            self.enter_jump_state()
+        if keys[pg.K_SPACE] and self.allow_jump:
+            self.enter_jump()
+
+        if not keys[pg.K_SPACE]:
+            self.allow_jump = True
 
     def walking(self, keys, current_time, dt):
         """
@@ -67,8 +72,15 @@ class Player(pg.sprite.Sprite):
             self.direction = c.RIGHT
         elif keys[pg.K_LEFT]:
             self.direction = c.LEFT
-        if keys[pg.K_SPACE]:
-            self.enter_jump_state()
+        if keys[c.JUMP_BUTTON] and self.allow_jump:
+            self.enter_jump()
+        if keys[c.RUN_BUTTON]:
+            self.max_speed = c.RUN_SPEED
+        elif not keys[c.RUN_BUTTON]:
+            self.max_speed = c.WALK_SPEED
+
+        if not keys[pg.K_SPACE]:
+            self.allow_jump = True
 
     def animate(self, current_time, dt):
         """
@@ -94,14 +106,14 @@ class Player(pg.sprite.Sprite):
 
         return frequency
 
-    def enter_jump_state(self):
+    def enter_jump(self):
         """
         Set values to enter jump state.
         """
-        self.state = c.JUMPING
+        self.state = c.FREE_FALL
         self.y_vel = c.START_JUMP_VEL
 
-    def jumping(self, keys, current_time, dt):
+    def free_fall(self, keys, current_time, dt):
         """
         Jumping state.
         """
@@ -179,5 +191,27 @@ class Player(pg.sprite.Sprite):
     def update(self, keys, current_time, dt):
         state_function = self.state_dict[self.state]
         state_function(keys, current_time, dt)
+
+    def enter_walking(self):
+        """
+        Transition into walking state.
+        """
+        self.allow_jump = False
+        self.y_vel = 0
+        self.state = c.WALKING
+
+    def enter_standing(self):
+        """
+        Transition into standing state.
+        """
+        self.state = c.STANDING
+        self.x_vel = 0
+
+    def enter_fall(self):
+        """
+        Transition into standing state.
+        """
+        self.state = c.FREE_FALL
+        self.y_vel = 0
 
 

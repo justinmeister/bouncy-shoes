@@ -25,8 +25,10 @@ class Level(tools._State):
         self.level_rect = self.level_surface.get_rect()
         self.player = self.make_player()
         self.sprites = self.make_sprites()
+        self.blockers = self.make_blockers()
         self.collision_handler = collision.CollisionHandler(self.player,
-                                                            self.sprites)
+                                                            self.sprites,
+                                                            self.blockers)
         self.state_dict = self.make_state_dict()
 
     def make_viewport(self, map_image):
@@ -48,10 +50,32 @@ class Level(tools._State):
         return pg.Surface(size).convert()
 
     def make_player(self):
-        return player.Player()
+        for object in self.renderer.tmx_data.getObjects():
+            properties = object.__dict__
+            if properties['name'] == 'player start point':
+                x = properties['x']
+                y = properties['y']
+                return player.Player(x, y)
 
     def make_sprites(self):
         return pg.sprite.Group()
+
+    def make_blockers(self):
+        """
+        Make the collideable blockers the player can collide with.
+        """
+        blockers = pg.sprite.Group()
+        for object in self.renderer.tmx_data.getObjects():
+            properties = object.__dict__
+            if properties['name'] == 'blocker':
+                x = properties['x']
+                y = properties['y'] - 70
+                width = height = 70
+                blocker = pg.sprite.Sprite()
+                blocker.rect = pg.Rect(x, y, width, height)
+                blockers.add(blocker)
+
+        return blockers
 
     def make_state_dict(self):
         """
