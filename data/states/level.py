@@ -65,7 +65,7 @@ class Level(tools._State):
         """
         Update level normally.
         """
-        self.player.update(keys, current_time)
+        self.player.update(keys, current_time, dt)
         self.sprites.update(current_time)
         self.collision_handler.update(keys, current_time, dt)
         self.viewport_update()

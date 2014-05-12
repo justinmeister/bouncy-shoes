@@ -19,13 +19,13 @@ class CollisionHandler(object):
     def update(self, keys, current_time, dt):
         if self.player.state == c.WALKING:
             self.update_walking_player(keys, dt)
+        elif self.player.state == c.JUMPING:
+            self.update_jumping_player(keys, dt)
 
     def update_walking_player(self, keys, dt):
         """
         Move player when walking
         """
-        RESISTANCE = 2
-
         if keys[pg.K_RIGHT]:
             self.player.direction = c.RIGHT
             self.player.x_vel += (c.MAX_SPEED - self.player.x_vel) * .1
@@ -40,11 +40,21 @@ class CollisionHandler(object):
                 self.player.x_vel += (0 - self.player.x_vel) * .1
 
 
-        self.player.rect.x += self.player.x_vel
+        self.player.rect.x += self.player.x_vel * dt
 
         if self.player.x_vel > 0:
-            if math.floor(self.player.x_vel) == 0.0:
+            if self.player.x_vel <= 25.0:
                 self.player.state = c.STANDING
+                self.player.x_vel = 0
         else:
-            if math.ceil(self.player.x_vel) == 0.0:
+            if self.player.x_vel >= -25.0:
                 self.player.state = c.STANDING
+
+    def update_jumping_player(self, keys, dt):
+        """
+        Move player while jumping
+        """
+        self.player.rect.x += self.player.x_vel * dt
+        self.player.rect.y += self.player.y_vel * dt
+        self.player.y_vel += c.GRAVITY * dt
+

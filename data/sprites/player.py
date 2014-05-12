@@ -18,6 +18,7 @@ class Player(pg.sprite.Sprite):
         self.state = c.STANDING
         self.walking_image_dict = self.make_walking_image_dict()
         self.standing_image_dict = self.make_standing_image_dict()
+        self.jumping_image_dict = self.make_jumping_image_dict()
         self.index = 0
         self.timer = 0.0
         self.direction = c.RIGHT
@@ -31,10 +32,11 @@ class Player(pg.sprite.Sprite):
         Make the dictionary of state methods for player.
         """
         state_dict = {c.STANDING: self.standing,
-                      c.WALKING: self.walking}
+                      c.WALKING: self.walking,
+                      c.JUMPING: self.jumping}
         return state_dict
 
-    def standing(self, keys, current_time):
+    def standing(self, keys, current_time, dt):
         """
         State when player is still.
         """
@@ -50,28 +52,64 @@ class Player(pg.sprite.Sprite):
             self.direction = c.LEFT
             self.state = c.WALKING
             self.timer = current_time
+        if keys[pg.K_SPACE]:
+            self.enter_jump_state()
 
-    def walking(self, keys, current_time):
+    def walking(self, keys, current_time, dt):
         """
         State when player is walking.
         """
         self.image_list = self.walking_image_dict[self.direction]
         self.image = self.image_list[self.index]
+        self.animate(current_time, dt)
 
-        if (current_time - self.timer) > 100:
+        if keys[pg.K_RIGHT]:
+            self.direction = c.RIGHT
+        elif keys[pg.K_LEFT]:
+            self.direction = c.LEFT
+        if keys[pg.K_SPACE]:
+            self.enter_jump_state()
+
+    def animate(self, current_time, dt):
+        """
+        Animate sprite.
+        """
+        if (current_time - self.timer) > self.get_animation_speed(dt):
             self.timer = current_time
             if self.index < (len(self.image_list) - 1):
                 self.index += 1
             else:
                 self.index = 0
 
+    def get_animation_speed(self, dt):
+        """
+        Calculate frame frequency by x_vel.
+        """
+        if self.x_vel == 0:
+            frequency = c.SLOWEST_FREQUENCY
+        elif self.x_vel > 0:
+            frequency = c.SLOWEST_FREQUENCY - (self.x_vel * 11 * dt)
+        else:
+            frequency = c.SLOWEST_FREQUENCY - (self.x_vel * dt * 11 * -1)
+
+        return frequency
+
+    def enter_jump_state(self):
+        """
+        Set values to enter jump state.
+        """
+        self.state = c.JUMPING
+        self.y_vel = c.START_JUMP_VEL
+
+    def jumping(self, keys, current_time, dt):
+        """
+        Jumping state.
+        """
+        self.image = self.jumping_image_dict[self.direction]
         if keys[pg.K_RIGHT]:
             self.direction = c.RIGHT
         elif keys[pg.K_LEFT]:
             self.direction = c.LEFT
-
-
-
 
 
     def make_walking_image_dict(self):
@@ -107,6 +145,7 @@ class Player(pg.sprite.Sprite):
                                                  width, height,
                                                  sprite_sheet))
         walking_images.pop(-1)
+        #walking_images.pop(-1)
 
         if reverse_images:
             flipped_images = []
@@ -126,8 +165,19 @@ class Player(pg.sprite.Sprite):
         return {c.RIGHT: right_image,
                 c.LEFT: left_image}
 
-    def update(self, keys, current_time):
+    def make_jumping_image_dict(self):
+        """
+        Make the list of the jumping images.
+        """
+        sheet = setup.GFX['p1_jumping']
+        right_image = self.get_image(0, 0, 66, 97, sheet)
+        left_image = self.get_image(66, 0, 66, 97, sheet)
+
+        return {c.RIGHT: right_image,
+                c.LEFT: left_image}
+
+    def update(self, keys, current_time, dt):
         state_function = self.state_dict[self.state]
-        state_function(keys, current_time)
+        state_function(keys, current_time, dt)
 
 
