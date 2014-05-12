@@ -61,22 +61,22 @@ class Level(tools._State):
 
         return state_dict
 
-    def normal_mode(self, surface, keys, current_time):
+    def normal_mode(self, surface, keys, current_time, dt):
         """
         Update level normally.
         """
         self.player.update(keys, current_time)
         self.sprites.update(current_time)
-        self.collision_handler.update(keys, current_time)
+        self.collision_handler.update(keys, current_time, dt)
         self.viewport_update()
         self.draw_level(surface)
 
-    def update(self, surface, keys, current_time):
+    def update(self, surface, keys, current_time, dt):
         """
         Update state.
         """
         state_function = self.state_dict[self.state]
-        state_function(surface, keys, current_time)
+        state_function(surface, keys, current_time, dt)
 
     def viewport_update(self):
         """

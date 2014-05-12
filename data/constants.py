@@ -15,8 +15,7 @@ STANDING = 'standing'
 WALKING = 'walking'
 
 #PLAYER values
-ACCELERATION = 1
-MAX_SPEED = 15
+MAX_SPEED = 10
 
 #FONTS
 MAIN_FONT = 'DroidSans'

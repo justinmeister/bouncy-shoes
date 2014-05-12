@@ -1,3 +1,4 @@
+from __future__ import division
 import os
 import pygame as pg
 from . import constants as c
@@ -16,6 +17,7 @@ class Control(object):
         self.fps = 60
         self.show_fps = False
         self.current_time = 0.0
+        self.last_time = 0.0
         self.keys = pg.key.get_pressed()
         self.state_dict = {}
         self.state_name = None
@@ -26,12 +28,15 @@ class Control(object):
         self.state = self.state_dict[self.state_name]
 
     def update(self):
+        self.last_time = self.current_time
         self.current_time = pg.time.get_ticks()
+        self.delta_time = (self.current_time - self.last_time) / 1000
         if self.state.quit:
             self.done = True
         elif self.state.done:
             self.flip_state()
-        self.state.update(self.screen, self.keys, self.current_time)
+        self.state.update(self.screen, self.keys,
+                          self.current_time, self.delta_time)
 
     def flip_state(self):
         previous, self.state_name = self.state_name, self.state.next
@@ -101,7 +106,7 @@ class _State(object):
         self.done = False
         return self.game_data
 
-    def update(self, surface, keys, current_time):
+    def update(self, surface, keys, current_time, dt):
         pass
 
 

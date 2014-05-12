@@ -17,7 +17,7 @@ class Menu(tools._State):
         self.game_data = tools.create_game_data_dict()
         self.name = c.MAIN_MENU
 
-    def update(self, surface, keys, current_time):
+    def update(self, surface, keys, current_time, dt):
         self.current_time = current_time
         surface.fill(c.WHITE)
         surface.blit(self.rendered_text, self.text_rect)

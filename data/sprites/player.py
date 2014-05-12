@@ -24,7 +24,7 @@ class Player(pg.sprite.Sprite):
         self.x_vel = 0
         self.y_vel = 0
         self.image = self.standing_image_dict[self.direction]
-        self.rect = self.image.get_rect(y=525)
+        self.rect = self.image.get_rect(y=535)
 
     def make_state_dict(self):
         """
@@ -69,9 +69,7 @@ class Player(pg.sprite.Sprite):
             self.direction = c.RIGHT
         elif keys[pg.K_LEFT]:
             self.direction = c.LEFT
-        else:
-            self.state = c.STANDING
-            self.x_vel = 0
+
 
 
 

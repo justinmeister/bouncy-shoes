@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="20" height="10" tilewidth="70" tileheight="70" backgroundcolor="#00004e">
+ <tileset firstgid="1" name="spritesheet1" tilewidth="70" tileheight="70">
+  <image source="../graphics/spritesheet1.png" width="910" height="910"/>
+ </tileset>
+ <layer name="Tile Layer 1" width="20" height="10">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2D4gAlAPI8KuA9qHgACVgud
+  </data>
+ </layer>
+</map>
