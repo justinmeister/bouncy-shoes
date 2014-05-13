@@ -11,18 +11,26 @@ class CollisionHandler(object):
     Handles collisions between the player, enemies and game
     objects.
     """
-    def __init__(self, player, sprites, blockers):
+    def __init__(self, player, sprites, blockers, item_boxes):
         self.player = player
         self.sprites = sprites
         self.blockers = blockers
+        self.item_boxes = item_boxes
+        self.state_dict = self.make_state_dict()
+
+    def make_state_dict(self):
+        """
+        Make dictionary for collision handler states.
+        """
+        state_dict = {c.WALKING: self.update_walking_player,
+                      c.FREE_FALL: self.update_player_in_freefall,
+                      c.STANDING: self.update_walking_player}
+
+        return state_dict
 
     def update(self, keys, current_time, dt):
-        if self.player.state == c.WALKING:
-            self.update_walking_player(keys, dt)
-        elif self.player.state == c.FREE_FALL:
-            self.update_player_in_freefall(keys, dt)
-        elif self.player.state == c.STANDING:
-            self.update_walking_player(keys, dt)
+        state_function = self.state_dict[self.player.state]
+        state_function(keys, dt)
 
     def update_walking_player(self, keys, dt):
         """
@@ -30,7 +38,7 @@ class CollisionHandler(object):
         """
         self.adjust_horizontal_motion(keys)
         self.player.rect.x += self.player.x_vel * dt
-        self.check_for_blockers(False, True)
+        self.check_for_collision(False, True)
 
         if self.player.x_vel > 0:
             if self.player.x_vel <= 25.0:
@@ -48,32 +56,63 @@ class CollisionHandler(object):
         self.adjust_horizontal_motion(keys, False)
 
         self.player.rect.x += self.player.x_vel * dt
-        self.check_for_blockers(False, True)
+        self.check_for_collision(False, True)
         self.player.rect.y += self.player.y_vel * dt
-        self.check_for_blockers(True)
+        self.check_for_collision(True)
 
         self.player.y_vel += c.GRAVITY * dt
 
 
-    def check_for_blockers(self, vertical=False, horiz=False):
+    def check_for_collision(self, vertical=False, horiz=False):
         """
         Check for ground and other blockers while in air.
         """
         blocker = pg.sprite.spritecollideany(self.player, self.blockers)
+        item_box = pg.sprite.spritecollideany(self.player, self.item_boxes)
 
         if blocker and vertical:
+            self.adjust_blocker_collision(blocker, True)
+        elif blocker and horiz:
+            self.adjust_blocker_collision(blocker, False, True)
+
+        if item_box and vertical:
+            self.adjust_item_box_collision(item_box, True)
+        elif item_box and horiz:
+            self.adjust_item_box_collision(item_box, False, True)
+
+    def adjust_blocker_collision(self, blocker, vertical=False, horiz=False):
+        """
+        Adjust for collision with blockers.
+        """
+        if vertical:
             if self.player.y_vel > 0:
                 self.player.rect.bottom = blocker.rect.top
                 self.player.enter_walking()
             elif self.player.y_vel < 0:
                 self.player.rect.top = blocker.rect.bottom
                 self.player.y_vel = 0
-
-        if blocker and horiz:
+        elif horiz:
             if self.player.x_vel > 0:
                 self.player.rect.right = blocker.rect.left
             elif self.player.x_vel < 0:
                 self.player.rect.left = blocker.rect.right
+
+    def adjust_item_box_collision(self, item_box, vertical=False, horiz=False):
+        """
+        Adjust for collision with item boxes.
+        """
+        if vertical:
+            if self.player.y_vel > 0:
+                self.player.rect.bottom = item_box.rect.top
+                self.player.enter_walking()
+            elif self.player.y_vel < 0:
+                self.player.rect.top = item_box.rect.bottom
+                self.player.y_vel = 0
+        if horiz:
+            if self.player.x_vel > 0:
+                self.player.rect.right = item_box.rect.left
+            elif self.player.x_vel < 0:
+                self.player.rect.left = item_box.rect.right
 
     def check_for_ground(self):
         """

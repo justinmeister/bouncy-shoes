@@ -4,7 +4,7 @@ State for levels.
 import pygame as pg
 from .. import tools, setup, tilerender, collision
 from .. import constants as c
-from ..sprites import player
+from ..sprites import player, powerup
 
 
 class Level(tools._State):
@@ -26,9 +26,11 @@ class Level(tools._State):
         self.player = self.make_player()
         self.sprites = self.make_sprites()
         self.blockers = self.make_blockers()
+        self.item_boxes = self.make_item_boxes()
         self.collision_handler = collision.CollisionHandler(self.player,
                                                             self.sprites,
-                                                            self.blockers)
+                                                            self.blockers,
+                                                            self.item_boxes)
         self.state_dict = self.make_state_dict()
 
     def make_viewport(self, map_image):
@@ -77,6 +79,22 @@ class Level(tools._State):
 
         return blockers
 
+    def make_item_boxes(self):
+        """
+        Make item box sprite group.
+        """
+        item_boxes = pg.sprite.Group()
+        for object in self.renderer.tmx_data.getObjects():
+            properties = object.__dict__
+            if properties['name'] == 'item box':
+                x = properties['x']
+                y = properties['y'] - 70
+                width = height = 70
+                box = powerup.ItemBox(x, y)
+                item_boxes.add(box)
+
+        return item_boxes
+
     def make_state_dict(self):
         """
         Make a dictionary of states the level can be in.
@@ -91,6 +109,7 @@ class Level(tools._State):
         """
         self.player.update(keys, current_time, dt)
         self.sprites.update(current_time)
+        self.item_boxes.update(current_time)
         self.collision_handler.update(keys, current_time, dt)
         self.viewport_update()
         self.draw_level(surface)
@@ -117,6 +136,7 @@ class Level(tools._State):
         self.level_surface.blit(self.map_image, self.viewport, self.viewport)
         self.level_surface.blit(self.player.image, self.player.rect)
         self.sprites.draw(self.level_surface)
+        self.item_boxes.draw(self.level_surface)
         surface.blit(self.level_surface, (0, 0), self.viewport)
 
 

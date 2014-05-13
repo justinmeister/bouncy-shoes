@@ -18,12 +18,11 @@ WALKING = 'walking'
 FREE_FALL = 'free fall'
 
 #PLAYER values
-MAX_SPEED = 450
 SLOWEST_FREQUENCY = 100
 START_JUMP_VEL = -800
 GRAVITY = 2000
 RUN_SPEED = 600
-WALK_SPEED = 450
+WALK_SPEED = 350
 
 #FONTS
 MAIN_FONT = 'DroidSans'
@@ -37,3 +36,8 @@ LEFT = 'left'
 
 JUMP_BUTTON = pg.K_a
 RUN_BUTTON = pg.K_s
+
+#ITEM BOX STATE
+NORMAL = 'normal'
+BUMPED = 'bumped'
+OPENED = 'opened'

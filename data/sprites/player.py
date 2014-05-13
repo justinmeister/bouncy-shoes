@@ -54,10 +54,10 @@ class Player(pg.sprite.Sprite):
             self.direction = c.LEFT
             self.state = c.WALKING
             self.timer = current_time
-        if keys[pg.K_SPACE] and self.allow_jump:
+        if keys[c.JUMP_BUTTON] and self.allow_jump:
             self.enter_jump()
 
-        if not keys[pg.K_SPACE]:
+        if not keys[c.JUMP_BUTTON]:
             self.allow_jump = True
 
     def walking(self, keys, current_time, dt):
@@ -79,7 +79,7 @@ class Player(pg.sprite.Sprite):
         elif not keys[c.RUN_BUTTON]:
             self.max_speed = c.WALK_SPEED
 
-        if not keys[pg.K_SPACE]:
+        if not keys[c.JUMP_BUTTON]:
             self.allow_jump = True
 
     def animate(self, current_time, dt):

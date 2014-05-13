@@ -39,5 +39,6 @@
   <object name="blocker" gid="2" x="840" y="560"/>
   <object name="blocker" gid="2" x="770" y="560"/>
   <object name="player start point" gid="6" x="70" y="140"/>
+  <object name="item box" gid="98" x="910" y="350"/>
  </objectgroup>
 </map>
