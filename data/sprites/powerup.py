@@ -18,9 +18,9 @@ class ItemBox(pg.sprite.Sprite):
         self.state = c.NORMAL
         self.timer = 0.0
         self.first_half = True
-        self.bump_gravity = 100
         self.y_vel = 0
         self.start_y = y
+        self.opened_image = self.make_opened_image()
 
     def make_image_list(self):
         """
@@ -47,6 +47,13 @@ class ItemBox(pg.sprite.Sprite):
                       c.OPENED: self.opened_state}
 
         return state_dict
+
+    def make_opened_image(self):
+        """
+        Make the image when the box has been opened.
+        """
+        sprite_sheet = setup.GFX['spritesheet1']
+        return self.get_image(280, 490, 70, 70, sprite_sheet)
 
     def update(self, current_time):
         """
@@ -91,14 +98,13 @@ class ItemBox(pg.sprite.Sprite):
         """
         Update when box in bumped state.
         """
-        pass
+        self.image = self.opened_image
 
     def opened_state(self, *args):
         """
         Update when box in opened state.
         """
-        sprite_sheet = setup.GFX['spritesheet1']
-        self.image = self.get_image(280, 490, 70, 70, sprite_sheet)
+        self.image = self.opened_image
 
     def enter_bump(self):
         """
@@ -122,9 +128,23 @@ class BouncyStar(pg.sprite.Sprite):
     """
     def __init__(self, x, y):
         super(BouncyStar, self).__init__()
-        print x
+        self.name = 'bouncy star'
         self.image = setup.GFX['star']
         self.rect = self.image.get_rect(centerx=x, bottom=y)
+        self.y_vel = 0
+        self.start_y = y
+        self.y_vel = c.BUMP_SPEED
+        self.state = c.REVEAL
+
+    def enter_revealed_state(self):
+        """
+        Star enters a stationary state.
+        """
+        self.y_vel = 0
+        self.state = c.REVEALED
+        self.rect.bottom = self.start_y
+
+
 
 
 

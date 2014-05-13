@@ -27,10 +27,12 @@ class Level(tools._State):
         self.sprites = self.make_sprites()
         self.blockers = self.make_blockers()
         self.item_boxes = self.make_item_boxes()
+        self.stars = pg.sprite.Group()
         self.collision_handler = collision.CollisionHandler(self.player,
                                                             self.sprites,
                                                             self.blockers,
-                                                            self.item_boxes)
+                                                            self.item_boxes,
+                                                            self.stars)
         self.state_dict = self.make_state_dict()
 
     def make_viewport(self, map_image):
@@ -136,6 +138,7 @@ class Level(tools._State):
         self.level_surface.blit(self.map_image, self.viewport, self.viewport)
         self.level_surface.blit(self.player.image, self.player.rect)
         self.sprites.draw(self.level_surface)
+        self.stars.draw(self.level_surface)
         self.item_boxes.draw(self.level_surface)
         surface.blit(self.level_surface, (0, 0), self.viewport)
 

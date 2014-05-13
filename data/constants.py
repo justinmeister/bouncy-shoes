@@ -16,6 +16,7 @@ NORMAL = 'normal'
 STANDING = 'standing'
 WALKING = 'walking'
 FREE_FALL = 'free fall'
+BOUNCY = 'bouncy'
 
 #PLAYER values
 SLOWEST_FREQUENCY = 100
@@ -23,6 +24,7 @@ START_JUMP_VEL = -1020
 GRAVITY = 2520
 RUN_SPEED = 600
 WALK_SPEED = 350
+BOUNCE_TIME = 10000
 
 #FONTS
 MAIN_FONT = 'DroidSans'
@@ -42,3 +44,7 @@ BUMPED = 'bumped'
 OPENED = 'opened'
 BUMP_SPEED = -1000
 BUMP_GRAVITY = 6000
+
+#ITEM STATES
+REVEAL = 'reveal'
+REVEALED = 'revealed'

@@ -12,12 +12,14 @@ class CollisionHandler(object):
     Handles collisions between the player, enemies and game
     objects.
     """
-    def __init__(self, player, sprites, blockers, item_boxes):
+    def __init__(self, player, sprites, blockers, item_boxes, stars):
         self.player = player
         self.sprites = sprites
+        self.stars = stars
         self.blockers = blockers
         self.item_boxes = item_boxes
         self.state_dict = self.make_state_dict()
+        self.current_time = 0.0
 
     def make_state_dict(self):
         """
@@ -25,18 +27,20 @@ class CollisionHandler(object):
         """
         state_dict = {c.WALKING: self.update_walking_player,
                       c.FREE_FALL: self.update_player_in_freefall,
-                      c.STANDING: self.update_walking_player}
+                      c.STANDING: self.update_walking_player,
+                      c.BOUNCY: self.update_player_in_freefall}
 
         return state_dict
 
     def update(self, keys, current_time, dt):
         state_function = self.state_dict[self.player.state]
-        state_function(keys, dt)
+        state_function(keys, dt, current_time)
 
-    def update_walking_player(self, keys, dt):
+    def update_walking_player(self, keys, dt, current_time):
         """
         Move player when walking
         """
+        self.current_time = current_time
         self.adjust_horizontal_motion(keys)
         self.player.rect.x += self.player.x_vel * dt
         self.check_for_collision(False, True)
@@ -50,11 +54,13 @@ class CollisionHandler(object):
 
         self.check_for_ground()
         self.adjust_item_box_position(dt)
+        self.adjust_powerup_position(dt)
 
-    def update_player_in_freefall(self, keys, dt):
+    def update_player_in_freefall(self, keys, dt, current_time):
         """
         Move player while jumping
         """
+        self.current_time = current_time
         self.adjust_horizontal_motion(keys, False)
 
         self.player.rect.x += self.player.x_vel * dt
@@ -65,6 +71,7 @@ class CollisionHandler(object):
         self.player.y_vel += c.GRAVITY * dt
 
         self.adjust_item_box_position(dt)
+        self.adjust_powerup_position(dt)
 
 
     def check_for_collision(self, vertical=False, horiz=False):
@@ -73,6 +80,7 @@ class CollisionHandler(object):
         """
         blocker = pg.sprite.spritecollideany(self.player, self.blockers)
         item_box = pg.sprite.spritecollideany(self.player, self.item_boxes)
+        bouncy_star = pg.sprite.spritecollideany(self.player, self.stars)
 
         if blocker and vertical:
             self.adjust_blocker_collision(blocker, True)
@@ -84,6 +92,10 @@ class CollisionHandler(object):
         elif item_box and horiz:
             self.adjust_item_box_collision(item_box, False, True)
 
+        if bouncy_star:
+            bouncy_star.kill()
+            self.player.enter_bouncy_state(self.current_time)
+
     def adjust_blocker_collision(self, blocker, vertical=False, horiz=False):
         """
         Adjust for collision with blockers.
@@ -91,7 +103,10 @@ class CollisionHandler(object):
         if vertical:
             if self.player.y_vel > 0:
                 self.player.rect.bottom = blocker.rect.top
-                self.player.enter_walking()
+                if self.player.state == c.BOUNCY:
+                    self.player.y_vel = c.START_JUMP_VEL
+                else:
+                    self.player.enter_walking()
             elif self.player.y_vel < 0:
                 self.player.rect.top = blocker.rect.bottom
                 self.player.y_vel = 0
@@ -108,11 +123,15 @@ class CollisionHandler(object):
         if vertical:
             if self.player.y_vel > 0:
                 self.player.rect.bottom = item_box.rect.top
-                self.player.enter_walking()
+                if self.player.state == c.BOUNCY:
+                    self.player.y_vel = c.START_JUMP_VEL
+                else:
+                    self.player.enter_walking()
             elif self.player.y_vel < 0:
                 self.player.rect.top = item_box.rect.bottom
                 self.player.y_vel = 0
-                item_box.enter_bump()
+                if item_box.state == c.NORMAL:
+                    item_box.enter_bump()
         if horiz:
             if self.player.x_vel > 0:
                 self.player.rect.right = item_box.rect.left
@@ -171,8 +190,19 @@ class CollisionHandler(object):
                     x = item_box.rect.centerx
                     y = item_box.rect.top
                     bouncy_star = powerup.BouncyStar(x, y)
-                    print bouncy_star.rect
-                    self.sprites.add(bouncy_star)
+                    self.stars.add(bouncy_star)
+
+    def adjust_powerup_position(self, dt):
+        """
+        Adjust the position of star powerups based on y_vel.
+        """
+        for star in self.stars:
+            if star.state == c.REVEAL:
+                star.y_vel += c.BUMP_GRAVITY * dt
+                star.rect.y += star.y_vel * dt
+                if star.rect.bottom > star.start_y:
+                    star.enter_revealed_state()
+
 
 
 

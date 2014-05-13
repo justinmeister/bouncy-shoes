@@ -21,6 +21,7 @@ class Player(pg.sprite.Sprite):
         self.jumping_image_dict = self.make_jumping_image_dict()
         self.index = 0
         self.timer = 0.0
+        self.bouncy_timer = 0.0
         self.direction = c.RIGHT
         self.x_vel = 0
         self.y_vel = 0
@@ -35,7 +36,8 @@ class Player(pg.sprite.Sprite):
         """
         state_dict = {c.STANDING: self.standing,
                       c.WALKING: self.walking,
-                      c.FREE_FALL: self.free_fall}
+                      c.FREE_FALL: self.free_fall,
+                      c.BOUNCY: self.bouncing}
         return state_dict
 
     def standing(self, keys, current_time, dt):
@@ -113,7 +115,7 @@ class Player(pg.sprite.Sprite):
         self.state = c.FREE_FALL
         self.y_vel = c.START_JUMP_VEL
 
-    def free_fall(self, keys, current_time, dt):
+    def free_fall(self, keys, *args):
         """
         Jumping state.
         """
@@ -122,6 +124,20 @@ class Player(pg.sprite.Sprite):
             self.direction = c.RIGHT
         elif keys[pg.K_LEFT]:
             self.direction = c.LEFT
+
+    def bouncing(self, keys, current_time, *args):
+        """
+        Bouncing state.
+        """
+        self.free_fall(keys)
+
+        if keys[c.RUN_BUTTON]:
+            self.max_speed = c.RUN_SPEED
+        elif not keys[c.RUN_BUTTON]:
+            self.max_speed = c.WALK_SPEED
+
+        if (current_time - self.bouncy_timer) > c.BOUNCE_TIME:
+            self.state = c.FREE_FALL
 
 
     def make_walking_image_dict(self):
@@ -213,5 +229,13 @@ class Player(pg.sprite.Sprite):
         """
         self.state = c.FREE_FALL
         self.y_vel = 0
+
+    def enter_bouncy_state(self, current_time):
+        """
+        Transition into bouncy state.
+        """
+        self.bouncy_timer = current_time
+        self.state = c.BOUNCY
+        self.y_vel = c.START_JUMP_VEL
 
 
