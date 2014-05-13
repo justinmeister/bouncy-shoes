@@ -1,7 +1,8 @@
 """
 Main controllable player.
 """
-
+from __future__ import division
+import copy
 import pygame as pg
 from .. import tools, setup
 from .. import constants as c
@@ -25,6 +26,7 @@ class Player(pg.sprite.Sprite):
         self.direction = c.RIGHT
         self.x_vel = 0
         self.y_vel = 0
+        self.tint_alpha = 255
         self.max_speed = c.WALK_SPEED
         self.allow_jump = False
         self.image = self.standing_image_dict[self.direction]
@@ -138,6 +140,27 @@ class Player(pg.sprite.Sprite):
 
         if (current_time - self.bouncy_timer) > c.BOUNCE_TIME:
             self.state = c.FREE_FALL
+
+        self.color_fade()
+
+    def color_fade(self):
+        """
+        Fade a color tint based on player height.
+        """
+        self.image = copy.copy(self.jumping_image_dict[self.direction])
+        tinted_image = copy.copy(self.image).convert_alpha()
+        tinted_image.fill((0, 255, 0, self.tint_alpha), special_flags=pg.BLEND_RGBA_MULT)
+        self.image.blit(tinted_image, (0, 0))
+
+        if self.y_vel <= 0:
+            percent = (self.y_vel / c.START_JUMP_VEL)
+        else:
+            percent = 0
+        self.tint_alpha = int(255 * percent)
+        if self.tint_alpha < 0:
+            self.tint_alpha = 0
+        elif self.tint_alpha > 255:
+            self.tint_alpha = 255
 
 
     def make_walking_image_dict(self):
