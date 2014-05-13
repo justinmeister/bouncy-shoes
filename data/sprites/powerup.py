@@ -18,6 +18,9 @@ class ItemBox(pg.sprite.Sprite):
         self.state = c.NORMAL
         self.timer = 0.0
         self.first_half = True
+        self.bump_gravity = 100
+        self.y_vel = 0
+        self.start_y = y
 
     def make_image_list(self):
         """
@@ -84,17 +87,48 @@ class ItemBox(pg.sprite.Sprite):
                     self.timer = current_time
 
 
-    def bumped_state(self):
+    def bumped_state(self, *args):
         """
         Update when box in bumped state.
         """
         pass
 
-    def opened_state(self):
+    def opened_state(self, *args):
         """
         Update when box in opened state.
         """
-        pass
+        sprite_sheet = setup.GFX['spritesheet1']
+        self.image = self.get_image(280, 490, 70, 70, sprite_sheet)
+
+    def enter_bump(self):
+        """
+        Transition item box into bumped state.
+        """
+        self.y_vel = c.BUMP_SPEED
+        self.state = c.BUMPED
+
+    def enter_opened_state(self):
+        """
+        Transition item box into bumped state.
+        """
+        self.rect.bottom = self.start_y
+        self.y_vel = 0
+        self.state = c.OPENED
+
+
+class BouncyStar(pg.sprite.Sprite):
+    """
+    Powerup to give our hero a bouncy power.
+    """
+    def __init__(self, x, y):
+        super(BouncyStar, self).__init__()
+        print x
+        self.image = setup.GFX['star']
+        self.rect = self.image.get_rect(centerx=x, bottom=y)
+
+
+
+
 
 
 

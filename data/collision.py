@@ -4,6 +4,7 @@ Handle game collisions.
 import math
 import pygame as pg
 from . import constants as c
+from .sprites import powerup
 
 
 class CollisionHandler(object):
@@ -48,6 +49,7 @@ class CollisionHandler(object):
                 self.player.enter_standing()
 
         self.check_for_ground()
+        self.adjust_item_box_position(dt)
 
     def update_player_in_freefall(self, keys, dt):
         """
@@ -61,6 +63,8 @@ class CollisionHandler(object):
         self.check_for_collision(True)
 
         self.player.y_vel += c.GRAVITY * dt
+
+        self.adjust_item_box_position(dt)
 
 
     def check_for_collision(self, vertical=False, horiz=False):
@@ -108,6 +112,7 @@ class CollisionHandler(object):
             elif self.player.y_vel < 0:
                 self.player.rect.top = item_box.rect.bottom
                 self.player.y_vel = 0
+                item_box.enter_bump()
         if horiz:
             if self.player.x_vel > 0:
                 self.player.rect.right = item_box.rect.left
@@ -120,7 +125,9 @@ class CollisionHandler(object):
         """
         self.player.rect.y += 1
 
-        if not pg.sprite.spritecollideany(self.player, self.blockers):
+        collideables = pg.sprite.Group(self.blockers, self.item_boxes)
+
+        if not pg.sprite.spritecollideany(self.player, collideables):
             self.player.enter_fall()
 
         self.player.rect.y -= 1
@@ -150,6 +157,23 @@ class CollisionHandler(object):
             self.player.x_vel += (0 - self.player.x_vel) * .1
         elif self.player.x_vel < 0:
             self.player.x_vel += (0 - self.player.x_vel) * .1
+
+    def adjust_item_box_position(self, dt):
+        """
+        Adjust item_box position based on y_vel.
+        """
+        for item_box in self.item_boxes:
+            if item_box.state == c.BUMPED:
+                item_box.y_vel += c.BUMP_GRAVITY * dt
+                item_box.rect.y += item_box.y_vel * dt
+                if item_box.rect.bottom > item_box.start_y:
+                    item_box.enter_opened_state()
+                    x = item_box.rect.centerx
+                    y = item_box.rect.top
+                    bouncy_star = powerup.BouncyStar(x, y)
+                    print bouncy_star.rect
+                    self.sprites.add(bouncy_star)
+
 
 
 
