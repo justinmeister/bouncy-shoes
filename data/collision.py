@@ -93,8 +93,10 @@ class CollisionHandler(object):
             self.adjust_item_box_collision(item_box, False, True)
 
         if bouncy_star:
-            bouncy_star.kill()
-            self.player.enter_bouncy_state(self.current_time)
+            mask_collision = pg.sprite.collide_mask
+            if pg.sprite.spritecollideany(self.player, self.stars, mask_collision):
+                bouncy_star.kill()
+                self.player.enter_bouncy_state(self.current_time)
 
     def adjust_blocker_collision(self, blocker, vertical=False, horiz=False):
         """
