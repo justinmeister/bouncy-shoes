@@ -4,7 +4,7 @@ State for levels.
 import pygame as pg
 from .. import tools, setup, tilerender, collision
 from .. import constants as c
-from ..sprites import player, powerup
+from ..sprites import player, powerup, enemies
 
 
 class Level(tools._State):
@@ -62,7 +62,17 @@ class Level(tools._State):
                 return player.Player(x, y)
 
     def make_sprites(self):
-        return pg.sprite.Group()
+        sprite_group = pg.sprite.Group()
+
+        for object in self.renderer.tmx_data.getObjects():
+            properties = object.__dict__
+            if properties['type'] == 'enemy':
+                name = properties['name']
+                x = properties['x']
+                y = properties['y']
+                sprite_group.add(enemies.Enemy(x, y, name))
+
+        return sprite_group
 
     def make_blockers(self):
         """
@@ -110,7 +120,7 @@ class Level(tools._State):
         Update level normally.
         """
         self.player.update(keys, current_time, dt)
-        self.sprites.update(current_time)
+        self.sprites.update(current_time, dt)
         self.item_boxes.update(current_time)
         self.collision_handler.update(keys, current_time, dt)
         self.viewport_update()

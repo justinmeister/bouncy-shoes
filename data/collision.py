@@ -54,6 +54,7 @@ class CollisionHandler(object):
 
         self.check_for_ground()
         self.adjust_item_box_position(dt)
+        self.adjust_sprite_position(dt)
         self.adjust_powerup_position(dt)
 
     def update_player_in_freefall(self, keys, dt, current_time):
@@ -175,9 +176,9 @@ class CollisionHandler(object):
         Slow down character on ground.
         """
         if self.player.x_vel > 0:
-            self.player.x_vel += (0 - self.player.x_vel) * .1
+            self.player.x_vel += (0 - self.player.x_vel) * .075
         elif self.player.x_vel < 0:
-            self.player.x_vel += (0 - self.player.x_vel) * .1
+            self.player.x_vel += (0 - self.player.x_vel) * .075
 
     def adjust_item_box_position(self, dt):
         """
@@ -204,6 +205,13 @@ class CollisionHandler(object):
                 star.rect.y += star.y_vel * dt
                 if star.rect.bottom > star.start_y:
                     star.enter_revealed_state()
+
+    def adjust_sprite_position(self, dt):
+        """
+        Adjust the position of each sprite based on velocity.
+        """
+        pass
+
 
 
 

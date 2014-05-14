@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" width="20" height="10" tilewidth="70" tileheight="70" backgroundcolor="#00004e">
+<map version="1.0" orientation="orthogonal" width="40" height="10" tilewidth="70" tileheight="70" backgroundcolor="#00004e">
  <tileset firstgid="1" name="spritesheet1" tilewidth="70" tileheight="70">
   <image source="../graphics/spritesheet1.png" width="910" height="910"/>
  </tileset>
- <layer name="Tile Layer 1" width="20" height="10">
+ <layer name="Tile Layer 1" width="40" height="10">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFo4A2YAIQz0PCfVQwswcJE2MnIYxsHja3AgDb7BAD
+   eJxjYBgFo2AUjIKBBxOAeB4S7htY52AFPUiYHgA9TAhhZPeRoo8UjBwvAHYiG70=
   </data>
  </layer>
- <objectgroup name="Object Layer 1" width="20" height="10">
+ <objectgroup name="Object Layer 1" width="40" height="10">
   <object name="rect" gid="2" x="-2170" y="-1820" width="4900" height="4900"/>
   <object name="rect" gid="2" x="-1890" y="-2030" width="4900" height="4900"/>
   <object name="blocker" gid="2" x="0" y="700"/>
@@ -40,5 +40,25 @@
   <object name="blocker" gid="2" x="770" y="560"/>
   <object name="player start point" gid="6" x="70" y="140"/>
   <object name="item box" gid="98" x="910" y="420"/>
+  <object name="blocker" gid="2" x="1470" y="700"/>
+  <object name="blocker" gid="2" x="1610" y="700"/>
+  <object name="blocker" gid="2" x="1890" y="700"/>
+  <object name="blocker" gid="2" x="1960" y="700"/>
+  <object name="blocker" gid="2" x="1400" y="700"/>
+  <object name="blocker" gid="2" x="1330" y="700"/>
+  <object name="blocker" gid="2" x="1680" y="700"/>
+  <object name="blocker" gid="2" x="1750" y="700"/>
+  <object name="blocker" gid="2" x="1820" y="700"/>
+  <object name="blocker" gid="2" x="1540" y="700"/>
+  <object name="blocker" gid="2" x="2100" y="700"/>
+  <object name="blocker" gid="2" x="2030" y="700"/>
+  <object name="blocker" gid="2" x="2310" y="700"/>
+  <object name="blocker" gid="2" x="2450" y="700"/>
+  <object name="blocker" gid="2" x="2240" y="700"/>
+  <object name="blocker" gid="2" x="2170" y="700"/>
+  <object name="blocker" gid="2" x="2590" y="700"/>
+  <object name="blocker" gid="2" x="2520" y="700"/>
+  <object name="blocker" gid="2" x="2380" y="700"/>
+  <object name="enemy1" type="enemy" gid="10" x="560" y="490"/>
  </objectgroup>
 </map>
