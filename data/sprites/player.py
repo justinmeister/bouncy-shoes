@@ -31,7 +31,6 @@ class Player(pg.sprite.Sprite):
         self.allow_jump = False
         self.image = self.standing_image_dict[self.direction]
         self.rect = self.image.get_rect(x=x, bottom=y)
-        print self.rect.width, self.rect.height
 
     def make_state_dict(self):
         """

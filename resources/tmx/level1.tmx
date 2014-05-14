@@ -59,6 +59,6 @@
   <object name="blocker" gid="2" x="2590" y="700"/>
   <object name="blocker" gid="2" x="2520" y="700"/>
   <object name="blocker" gid="2" x="2380" y="700"/>
-  <object name="enemy1" type="enemy" gid="10" x="560" y="490"/>
+  <object name="enemy1" type="enemy" gid="10" x="1610" y="280"/>
  </objectgroup>
 </map>

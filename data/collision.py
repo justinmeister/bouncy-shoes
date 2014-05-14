@@ -52,7 +52,7 @@ class CollisionHandler(object):
             if self.player.x_vel >= -25.0:
                 self.player.enter_standing()
 
-        self.check_for_ground()
+        self.check_for_ground(self.player)
         self.adjust_item_box_position(dt)
         self.adjust_sprite_position(dt)
         self.adjust_powerup_position(dt)
@@ -73,6 +73,7 @@ class CollisionHandler(object):
 
         self.adjust_item_box_position(dt)
         self.adjust_powerup_position(dt)
+        self.adjust_sprite_position(dt)
 
 
     def check_for_collision(self, vertical=False, horiz=False):
@@ -84,14 +85,14 @@ class CollisionHandler(object):
         bouncy_star = pg.sprite.spritecollideany(self.player, self.stars)
 
         if blocker and vertical:
-            self.adjust_blocker_collision(blocker, True)
+            self.adjust_blocker_collision(self.player, blocker, True)
         elif blocker and horiz:
-            self.adjust_blocker_collision(blocker, False, True)
+            self.adjust_blocker_collision(self.player, blocker, False, True)
 
         if item_box and vertical:
-            self.adjust_item_box_collision(item_box, True)
+            self.adjust_blocker_collision(self.player, item_box, True)
         elif item_box and horiz:
-            self.adjust_item_box_collision(item_box, False, True)
+            self.adjust_blocker_collision(self.player, item_box, False, True)
 
         if bouncy_star:
             mask_collision = pg.sprite.collide_mask
@@ -99,60 +100,40 @@ class CollisionHandler(object):
                 bouncy_star.kill()
                 self.player.enter_bouncy_state(self.current_time)
 
-    def adjust_blocker_collision(self, blocker, vertical=False, horiz=False):
-        """
-        Adjust for collision with blockers.
-        """
-        if vertical:
-            if self.player.y_vel > 0:
-                self.player.rect.bottom = blocker.rect.top
-                if self.player.state == c.BOUNCY:
-                    self.player.y_vel = c.START_JUMP_VEL
-                else:
-                    self.player.enter_walking()
-            elif self.player.y_vel < 0:
-                self.player.rect.top = blocker.rect.bottom
-                self.player.y_vel = 0
-        elif horiz:
-            if self.player.x_vel > 0:
-                self.player.rect.right = blocker.rect.left
-            elif self.player.x_vel < 0:
-                self.player.rect.left = blocker.rect.right
-
-    def adjust_item_box_collision(self, item_box, vertical=False, horiz=False):
+    def adjust_blocker_collision(self, sprite, collider, vertical=False, horiz=False):
         """
         Adjust for collision with item boxes.
         """
         if vertical:
-            if self.player.y_vel > 0:
-                self.player.rect.bottom = item_box.rect.top
-                if self.player.state == c.BOUNCY:
-                    self.player.y_vel = c.START_JUMP_VEL
+            if sprite.y_vel > 0:
+                sprite.rect.bottom = collider.rect.top
+                if sprite.state == c.BOUNCY:
+                    sprite.y_vel = c.START_JUMP_VEL
                 else:
-                    self.player.enter_walking()
-            elif self.player.y_vel < 0:
-                self.player.rect.top = item_box.rect.bottom
-                self.player.y_vel = 0
-                if item_box.state == c.NORMAL:
-                    item_box.enter_bump()
+                    sprite.enter_walking()
+            elif sprite.y_vel < 0:
+                sprite.rect.top = collider.rect.bottom
+                sprite.y_vel = 0
+                if collider.state == c.NORMAL and collider.name == 'item box':
+                    collider.enter_bump()
         if horiz:
-            if self.player.x_vel > 0:
-                self.player.rect.right = item_box.rect.left
-            elif self.player.x_vel < 0:
-                self.player.rect.left = item_box.rect.right
+            if sprite.x_vel > 0:
+                sprite.rect.right = collider.rect.left
+            elif sprite.x_vel < 0:
+                sprite.rect.left = collider.rect.right
 
-    def check_for_ground(self):
+    def check_for_ground(self, sprite):
         """
         Check for ground when walking off ledge.
         """
-        self.player.rect.y += 1
+        sprite.rect.y += 1
 
         collideables = pg.sprite.Group(self.blockers, self.item_boxes)
 
-        if not pg.sprite.spritecollideany(self.player, collideables):
-            self.player.enter_fall()
+        if not pg.sprite.spritecollideany(sprite, collideables):
+            sprite.enter_fall()
 
-        self.player.rect.y -= 1
+        sprite.rect.y -= 1
 
     def adjust_horizontal_motion(self, keys, on_ground=True):
         """
@@ -210,7 +191,51 @@ class CollisionHandler(object):
         """
         Adjust the position of each sprite based on velocity.
         """
-        pass
+        for sprite in self.sprites:
+            if sprite.state == c.FREE_FALL:
+                sprite.y_vel += c.GRAVITY * dt
+            if sprite.x_vel < 0:
+                horiz_adjust = int(math.floor(sprite.x_vel * dt))
+            else:
+                horiz_adjust = int(math.ceil(sprite.x_vel * dt))
+
+            sprite.rect.x += horiz_adjust
+            self.check_for_enemy_horiz_collision(sprite)
+            sprite.rect.y += sprite.y_vel * dt
+            self.check_for_enemy_vertical_collision(sprite)
+            if sprite.state == c.WALKING:
+                self.check_for_ground(sprite)
+
+    def check_for_enemy_horiz_collision(self, enemy):
+        collideable = pg.sprite.Group(self.blockers, self.item_boxes)
+        collider = pg.sprite.spritecollideany(enemy, collideable)
+
+        if collider:
+            if enemy.direction == c.RIGHT:
+                enemy.rect.right = collider.rect.left
+                enemy.direction = c.LEFT
+                enemy.x_vel *= -1
+            elif enemy.direction == c.LEFT:
+                enemy.rect.left = collider.rect.right
+                enemy.direction = c.RIGHT
+                enemy.x_vel *= -1
+
+
+    def check_for_enemy_vertical_collision(self, enemy):
+        collideable = pg.sprite.Group(self.blockers, self.item_boxes)
+        collider = pg.sprite.spritecollideany(enemy, collideable)
+
+
+        if collider:
+            if enemy.y_vel > 0:
+                enemy.rect.bottom = collider.rect.top
+                enemy.enter_walking()
+            elif enemy.y_vel < 0:
+                enemy.rect.top = collider.rect.bottom
+                enemy.y_vel = 0
+
+
+
 
 
 

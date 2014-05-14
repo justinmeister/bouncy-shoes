@@ -9,6 +9,7 @@ class ItemBox(pg.sprite.Sprite):
     """
     def __init__(self, x, y):
         super(ItemBox, self).__init__()
+        self.name = 'item box'
         self.get_image = tools.get_image
         self.image_list = self.make_image_list()
         self.index = 0

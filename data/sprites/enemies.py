@@ -10,14 +10,14 @@ class Enemy(pg.sprite.Sprite):
     def __init__(self, x, y, name, direction=c.LEFT):
         super(Enemy, self).__init__()
         self.state_dict = self.make_state_dict()
-        self.state = c.WALKING
+        self.state = c.FREE_FALL
         self.walking_image_dict = self.make_walking_image_dict(name)
         self.direction = direction
         self.image_list = self.walking_image_dict[self.direction]
         self.index = 0
         self.timer = 0.0
         self.image = self.image_list[self.index]
-        self.x_vel = c.WALK_SPEED
+        self.x_vel = 0
         self.y_vel = 0
         self.rect = self.image.get_rect(x=x, bottom=y)
 
@@ -64,15 +64,33 @@ class Enemy(pg.sprite.Sprite):
         """
         Animate sprite.
         """
-        if (current_time - self.timer) > 400:
+        if (current_time - self.timer) > 300:
             self.timer = current_time
             if self.index < (len(self.image_list) - 1):
                 self.index += 1
             else:
                 self.index = 0
 
-    def free_fall_state(self):
+    def free_fall_state(self, *args):
         pass
+
+    def enter_walking(self):
+        """
+        Transition into walking state.
+        """
+        self.state = c.WALKING
+        self.y_vel = 0
+        if self.direction == c.RIGHT:
+            self.x_vel = c.SLOW_WALK_SPEED
+        else:
+            self.x_vel = c.SLOW_WALK_SPEED * -1
+
+    def enter_fall(self):
+        """
+        Transition into falling state.
+        """
+        self.state = c.FREE_FALL
+        self.y_vel = 0
 
 
 
