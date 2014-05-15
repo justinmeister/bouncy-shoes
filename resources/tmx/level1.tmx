@@ -1,68 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" width="40" height="10" tilewidth="70" tileheight="70" backgroundcolor="#00004e">
+<map version="1.0" orientation="orthogonal" width="70" height="20" tilewidth="70" tileheight="70" backgroundcolor="#00004e">
  <tileset firstgid="1" name="spritesheet1" tilewidth="70" tileheight="70">
   <image source="../graphics/spritesheet1.png" width="910" height="910"/>
  </tileset>
- <layer name="Tile Layer 1" width="40" height="10">
+ <layer name="Tile Layer 1" width="70" height="20">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFo2AUjIKBBxOAeB4S7htY52AFPUiYHgA9TAhhZPeRoo8UjBwvAHYiG70=
+   eJzt0lEGwDAQRdHZv6quoGttP0eJdAiJOIf7GUa8CAAAAABY2/V2p8655yzlSO3su4Fe+V8q7yq1dvhnr6M2/QD7UCGt
   </data>
  </layer>
- <objectgroup name="Object Layer 1" width="40" height="10">
-  <object name="rect" gid="2" x="-2170" y="-1820" width="4900" height="4900"/>
-  <object name="rect" gid="2" x="-1890" y="-2030" width="4900" height="4900"/>
-  <object name="blocker" gid="2" x="0" y="700"/>
-  <object name="blocker" gid="2" x="70" y="700"/>
-  <object name="blocker" gid="2" x="280" y="700"/>
-  <object name="blocker" gid="2" x="630" y="700"/>
-  <object name="blocker" gid="2" x="490" y="700"/>
-  <object name="blocker" gid="2" x="210" y="700"/>
-  <object name="blocker" gid="2" x="140" y="700"/>
-  <object name="blocker" gid="2" x="350" y="700"/>
-  <object name="blocker" gid="2" x="770" y="700"/>
-  <object name="blocker" gid="2" x="700" y="700"/>
-  <object name="blocker" gid="2" x="560" y="700"/>
-  <object name="blocker" gid="2" x="420" y="700"/>
-  <object name="blocker" gid="2" x="840" y="700"/>
-  <object name="blocker" gid="2" x="910" y="700"/>
-  <object name="blocker" gid="2" x="980" y="700"/>
-  <object name="blocker" gid="2" x="1120" y="700"/>
-  <object name="blocker" gid="2" x="1260" y="700"/>
-  <object name="blocker" gid="2" x="1190" y="700"/>
-  <object name="blocker" gid="2" x="1050" y="700"/>
-  <object name="blocker" gid="2" x="840" y="630"/>
-  <object name="blocker" gid="2" x="910" y="630"/>
-  <object name="blocker" gid="2" x="1050" y="560"/>
-  <object name="blocker" gid="2" x="980" y="630"/>
-  <object name="blocker" gid="2" x="980" y="560"/>
-  <object name="blocker" gid="2" x="910" y="560"/>
-  <object name="blocker" gid="2" x="840" y="560"/>
-  <object name="blocker" gid="2" x="770" y="560"/>
-  <object name="player start point" gid="6" x="70" y="140"/>
-  <object name="item box" gid="98" x="910" y="420"/>
-  <object name="blocker" gid="2" x="1470" y="700"/>
-  <object name="blocker" gid="2" x="1610" y="700"/>
-  <object name="blocker" gid="2" x="1890" y="700"/>
-  <object name="blocker" gid="2" x="1960" y="700"/>
-  <object name="blocker" gid="2" x="1400" y="700"/>
-  <object name="blocker" gid="2" x="1330" y="700"/>
-  <object name="blocker" gid="2" x="1680" y="700"/>
-  <object name="blocker" gid="2" x="1750" y="700"/>
-  <object name="blocker" gid="2" x="1820" y="700"/>
-  <object name="blocker" gid="2" x="1540" y="700"/>
-  <object name="blocker" gid="2" x="2100" y="700"/>
-  <object name="blocker" gid="2" x="2030" y="700"/>
-  <object name="blocker" gid="2" x="2310" y="700"/>
-  <object name="blocker" gid="2" x="2450" y="700"/>
-  <object name="blocker" gid="2" x="2240" y="700"/>
-  <object name="blocker" gid="2" x="2170" y="700"/>
-  <object name="blocker" gid="2" x="2590" y="700"/>
-  <object name="blocker" gid="2" x="2520" y="700"/>
-  <object name="blocker" gid="2" x="2380" y="700"/>
-  <object name="enemy1" type="enemy" gid="10" x="1610" y="280"/>
-  <object name="enemy blocker" gid="2" x="2660" y="630"/>
-  <object name="enemy1" type="enemy" gid="10" x="1890" y="210"/>
-  <object name="enemy1" type="enemy" gid="10" x="2030" y="280"/>
-  <object name="enemy1" type="enemy" gid="10" x="2310" y="350"/>
+ <objectgroup name="Object Layer 1" width="70" height="20">
+  <object name="rect" gid="2" x="-2170" y="-1120" width="4900" height="4900"/>
+  <object name="rect" gid="2" x="-1890" y="-1330" width="4900" height="4900"/>
+  <object name="blocker" gid="2" x="0" y="1400"/>
+  <object name="blocker" gid="2" x="70" y="1400"/>
+  <object name="blocker" gid="2" x="280" y="1400"/>
+  <object name="blocker" gid="2" x="630" y="1400"/>
+  <object name="blocker" gid="2" x="490" y="1400"/>
+  <object name="blocker" gid="2" x="210" y="1400"/>
+  <object name="blocker" gid="2" x="140" y="1400"/>
+  <object name="blocker" gid="2" x="350" y="1400"/>
+  <object name="blocker" gid="2" x="770" y="1400"/>
+  <object name="blocker" gid="2" x="700" y="1400"/>
+  <object name="blocker" gid="2" x="560" y="1400"/>
+  <object name="blocker" gid="2" x="420" y="1400"/>
+  <object name="blocker" gid="2" x="840" y="1400"/>
+  <object name="blocker" gid="2" x="910" y="1400"/>
+  <object name="blocker" gid="2" x="980" y="1400"/>
+  <object name="blocker" gid="2" x="1120" y="1400"/>
+  <object name="blocker" gid="2" x="1260" y="1400"/>
+  <object name="blocker" gid="2" x="1190" y="1400"/>
+  <object name="blocker" gid="2" x="1050" y="1400"/>
+  <object name="blocker" gid="2" x="840" y="1330"/>
+  <object name="blocker" gid="2" x="910" y="1330"/>
+  <object name="blocker" gid="2" x="1050" y="1260"/>
+  <object name="blocker" gid="2" x="980" y="1330"/>
+  <object name="blocker" gid="2" x="980" y="1260"/>
+  <object name="blocker" gid="2" x="910" y="1260"/>
+  <object name="blocker" gid="2" x="840" y="1260"/>
+  <object name="blocker" gid="2" x="770" y="1260"/>
+  <object name="player start point" gid="6" x="140" y="1120"/>
+  <object name="item box" gid="98" x="910" y="1120"/>
+  <object name="blocker" gid="2" x="1470" y="1400"/>
+  <object name="blocker" gid="2" x="1610" y="1400"/>
+  <object name="blocker" gid="2" x="1890" y="1400"/>
+  <object name="blocker" gid="2" x="1960" y="1400"/>
+  <object name="blocker" gid="2" x="1400" y="1400"/>
+  <object name="blocker" gid="2" x="1330" y="1400"/>
+  <object name="blocker" gid="2" x="1680" y="1400"/>
+  <object name="blocker" gid="2" x="1750" y="1400"/>
+  <object name="blocker" gid="2" x="1820" y="1400"/>
+  <object name="blocker" gid="2" x="1540" y="1400"/>
+  <object name="blocker" gid="2" x="2100" y="1400"/>
+  <object name="blocker" gid="2" x="2030" y="1400"/>
+  <object name="blocker" gid="2" x="2310" y="1400"/>
+  <object name="blocker" gid="2" x="2450" y="1400"/>
+  <object name="blocker" gid="2" x="2240" y="1400"/>
+  <object name="blocker" gid="2" x="2170" y="1400"/>
+  <object name="blocker" gid="2" x="2590" y="1400"/>
+  <object name="blocker" gid="2" x="2520" y="1400"/>
+  <object name="blocker" gid="2" x="2380" y="1400"/>
+  <object name="enemy1" type="enemy" gid="10" x="1400" y="1050"/>
+  <object name="enemy blocker" gid="2" x="2660" y="1330"/>
+  <object name="enemy1" type="enemy" gid="10" x="1750" y="1050"/>
+  <object name="enemy1" type="enemy" gid="10" x="2030" y="1050"/>
+  <object name="enemy1" type="enemy" gid="10" x="2310" y="1050"/>
+  <object name="blocker" gid="2" x="3010" y="1400"/>
+  <object name="blocker" gid="2" x="3080" y="1400"/>
+  <object name="blocker" gid="2" x="3220" y="1400"/>
+  <object name="blocker" gid="2" x="3150" y="1400"/>
+  <object name="blocker" gid="2" x="3290" y="1400"/>
+  <object name="blocker" gid="2" x="3640" y="1400"/>
+  <object name="blocker" gid="2" x="3710" y="1400"/>
+  <object name="blocker" gid="2" x="3920" y="1400"/>
+  <object name="blocker" gid="2" x="3850" y="1400"/>
+  <object name="blocker" gid="2" x="3780" y="1400"/>
  </objectgroup>
 </map>

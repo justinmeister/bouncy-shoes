@@ -131,7 +131,7 @@ class Level(tools._State):
         self.sprites.update(current_time, dt)
         self.item_boxes.update(current_time)
         self.collision_handler.update(keys, current_time, dt)
-        self.viewport_update()
+        self.viewport_update(dt)
         self.draw_level(surface)
 
     def update(self, surface, keys, current_time, dt):
@@ -141,12 +141,35 @@ class Level(tools._State):
         state_function = self.state_dict[self.state]
         state_function(surface, keys, current_time, dt)
 
-    def viewport_update(self):
+    def viewport_update(self, dt):
         """
         Update viewport so it stays centered on character,
         unless at edge of map.
         """
-        self.viewport.center = self.player.rect.center
+        vertical_offset = self.viewport.centery - self.player.rect.centery
+        horiz_offset = self.viewport.centerx - self.player.rect.centerx * -1
+        third = self.viewport.width // 3
+        two_thirds = third * 2
+
+        if vertical_offset > 0:
+            self.viewport.y -= vertical_offset * .1
+        elif vertical_offset < 0:
+            self.viewport.y -= vertical_offset * .1
+
+        if self.player.direction == c.RIGHT:
+            if self.viewport.x < self.player.rect.centerx - third:
+                self.viewport.x += 15
+
+        elif self.player.direction == c.LEFT:
+            if self.viewport.x > (self.player.rect.centerx - two_thirds):
+                self.viewport.right -= 15
+
+
+
+
+
+
+        #self.viewport.centerx = self.player.rect.centerx
         self.viewport.clamp_ip(self.level_rect)
 
     def draw_level(self, surface):
