@@ -151,15 +151,21 @@ def get_image(x, y, width, height, sprite_sheet):
     Extract image from sprite sheet.
     """
     image = pg.Surface([width, height])
-    rect = image.get_rect()
 
     image.blit(sprite_sheet, (0, 0), (x, y, width, height))
+
     image.set_colorkey(c.BLACK)
 
     return image
 
 def create_game_data_dict():
     return {}
+
+def rect_than_mask(one, two):
+    """
+    Test for rect collision, followed by mask collision.
+    """
+    return pg.sprite.collide_rect(one, two) and pg.sprite.collide_mask(one, two)
 
 
 

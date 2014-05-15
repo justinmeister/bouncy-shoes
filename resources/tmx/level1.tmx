@@ -60,5 +60,9 @@
   <object name="blocker" gid="2" x="2520" y="700"/>
   <object name="blocker" gid="2" x="2380" y="700"/>
   <object name="enemy1" type="enemy" gid="10" x="1610" y="280"/>
+  <object name="enemy blocker" gid="2" x="2660" y="630"/>
+  <object name="enemy1" type="enemy" gid="10" x="1890" y="210"/>
+  <object name="enemy1" type="enemy" gid="10" x="2030" y="280"/>
+  <object name="enemy1" type="enemy" gid="10" x="2310" y="350"/>
  </objectgroup>
 </map>

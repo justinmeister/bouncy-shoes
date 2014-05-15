@@ -27,8 +27,10 @@ class Player(pg.sprite.Sprite):
         self.x_vel = 0
         self.y_vel = 0
         self.tint_alpha = 255
+        self.damage_alpha = 255
         self.max_speed = c.WALK_SPEED
         self.allow_jump = False
+        self.damaged = False
         self.image = self.standing_image_dict[self.direction]
         self.rect = self.image.get_rect(x=x, bottom=y)
 
@@ -68,6 +70,7 @@ class Player(pg.sprite.Sprite):
         """
         State when player is walking.
         """
+        self.damaged = False
         self.image_list = self.walking_image_dict[self.direction]
         self.image = self.image_list[self.index]
         self.animate(current_time, dt)
@@ -126,6 +129,7 @@ class Player(pg.sprite.Sprite):
             self.direction = c.RIGHT
         elif keys[pg.K_LEFT]:
             self.direction = c.LEFT
+        self.damage_fade()
 
     def bouncing(self, keys, current_time, *args):
         """
@@ -161,6 +165,17 @@ class Player(pg.sprite.Sprite):
             self.tint_alpha = 0
         elif self.tint_alpha > 255:
             self.tint_alpha = 255
+
+    def damage_fade(self):
+        """
+        Turn red tint when damaged.
+        """
+        if self.damaged:
+            self.image = copy.copy(self.jumping_image_dict[self.direction])
+            tinted_image = copy.copy(self.image).convert_alpha()
+            tinted_image.fill((255, 0, 0, self.damage_alpha), special_flags=pg.BLEND_RGBA_MULT)
+            self.image.blit(tinted_image, (0, 0))
+            self.damage_alpha -= 5
 
 
     def make_walking_image_dict(self):
@@ -260,5 +275,19 @@ class Player(pg.sprite.Sprite):
         self.bouncy_timer = current_time
         self.state = c.BOUNCY
         self.y_vel = c.START_JUMP_VEL
+
+    def damaged_by_enemy(self, direction):
+        """
+        Transition into free fall state after being damaged by enemies.
+        """
+        self.state = c.FREE_FALL
+        self.damaged = True
+        self.damage_alpha = 255
+
+        if direction == c.LEFT:
+            self.x_vel = -200
+        else:
+            self.x_vel = 200
+        self.y_vel = -700
 
 

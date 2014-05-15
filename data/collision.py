@@ -2,9 +2,11 @@
 Handle game collisions.
 """
 import math
+import random
 import pygame as pg
 from . import constants as c
 from .sprites import powerup
+from . import tools
 
 
 class CollisionHandler(object):
@@ -12,12 +14,15 @@ class CollisionHandler(object):
     Handles collisions between the player, enemies and game
     objects.
     """
-    def __init__(self, player, sprites, blockers, item_boxes, stars):
+    def __init__(self, player, sprites, blockers, enemy_blockers, item_boxes, stars, dead_group1, dead_group2):
         self.player = player
         self.sprites = sprites
         self.stars = stars
         self.blockers = blockers
+        self.enemy_blockers = enemy_blockers
         self.item_boxes = item_boxes
+        self.dead_group1 = dead_group1
+        self.dead_group2 = dead_group2
         self.state_dict = self.make_state_dict()
         self.current_time = 0.0
 
@@ -82,7 +87,8 @@ class CollisionHandler(object):
         """
         blocker = pg.sprite.spritecollideany(self.player, self.blockers)
         item_box = pg.sprite.spritecollideany(self.player, self.item_boxes)
-        bouncy_star = pg.sprite.spritecollideany(self.player, self.stars)
+        bouncy_star = pg.sprite.spritecollideany(self.player, self.stars, tools.rect_than_mask)
+        enemy = pg.sprite.spritecollideany(self.player, self.sprites, tools.rect_than_mask)
 
         if blocker and vertical:
             self.adjust_blocker_collision(self.player, blocker, True)
@@ -95,10 +101,13 @@ class CollisionHandler(object):
             self.adjust_blocker_collision(self.player, item_box, False, True)
 
         if bouncy_star:
-            mask_collision = pg.sprite.collide_mask
-            if pg.sprite.spritecollideany(self.player, self.stars, mask_collision):
-                bouncy_star.kill()
-                self.player.enter_bouncy_state(self.current_time)
+            bouncy_star.kill()
+            self.player.enter_bouncy_state(self.current_time)
+
+        if enemy and vertical:
+            self.handle_enemy_collision_with_player(enemy, True)
+        elif enemy and horiz:
+            self.handle_enemy_collision_with_player(enemy, False, True)
 
     def adjust_blocker_collision(self, sprite, collider, vertical=False, horiz=False):
         """
@@ -139,17 +148,18 @@ class CollisionHandler(object):
         """
         Adjust horizontal motion.
         """
-        if keys[pg.K_RIGHT]:
-            self.player.direction = c.RIGHT
-            self.player.x_vel += (self.player.max_speed - self.player.x_vel) * .1
+        if not self.player.damaged:
+            if keys[pg.K_RIGHT]:
+                self.player.direction = c.RIGHT
+                self.player.x_vel += (self.player.max_speed - self.player.x_vel) * .1
 
-        elif keys[pg.K_LEFT]:
-            self.player.direction = c.LEFT
-            self.player.x_vel -= (self.player.max_speed + self.player.x_vel) * .1
+            elif keys[pg.K_LEFT]:
+                self.player.direction = c.LEFT
+                self.player.x_vel -= (self.player.max_speed + self.player.x_vel) * .1
 
-        else:
-            if on_ground:
-                self.ground_deceleration()
+            else:
+                if on_ground:
+                    self.ground_deceleration()
 
 
     def ground_deceleration(self):
@@ -192,22 +202,23 @@ class CollisionHandler(object):
         Adjust the position of each sprite based on velocity.
         """
         for sprite in self.sprites:
-            if sprite.state == c.FREE_FALL:
-                sprite.y_vel += c.GRAVITY * dt
-            if sprite.x_vel < 0:
-                horiz_adjust = int(math.floor(sprite.x_vel * dt))
-            else:
-                horiz_adjust = int(math.ceil(sprite.x_vel * dt))
+            if not sprite.state == c.DEAD_ON_GROUND:
+                if sprite.state == c.FREE_FALL or sprite.state == c.IN_AIR:
+                    sprite.y_vel += c.GRAVITY * dt
+                if sprite.x_vel < 0:
+                    horiz_adjust = int(math.floor(sprite.x_vel * dt))
+                else:
+                    horiz_adjust = int(math.ceil(sprite.x_vel * dt))
 
-            sprite.rect.x += horiz_adjust
-            self.check_for_enemy_horiz_collision(sprite)
-            sprite.rect.y += sprite.y_vel * dt
-            self.check_for_enemy_vertical_collision(sprite)
-            if sprite.state == c.WALKING:
-                self.check_for_ground(sprite)
+                sprite.rect.x += horiz_adjust
+                self.check_for_enemy_horiz_collision(sprite)
+                sprite.rect.y += sprite.y_vel * dt
+                self.check_for_enemy_vertical_collision(sprite)
+                if sprite.state == c.WALKING:
+                    self.check_for_ground(sprite)
 
     def check_for_enemy_horiz_collision(self, enemy):
-        collideable = pg.sprite.Group(self.blockers, self.item_boxes)
+        collideable = pg.sprite.Group(self.blockers, self.item_boxes, self.enemy_blockers)
         collider = pg.sprite.spritecollideany(enemy, collideable)
 
         if collider:
@@ -228,11 +239,63 @@ class CollisionHandler(object):
 
         if collider:
             if enemy.y_vel > 0:
-                enemy.rect.bottom = collider.rect.top
-                enemy.enter_walking()
+                x = enemy.rect.x
+                if enemy.state == c.IN_AIR:
+                    enemy.enter_dead_on_ground_state()
+                    enemy.rect.x = x
+                    enemy.rect.bottom = collider.rect.top + 12
+
+                else:
+                    enemy.enter_walking()
+                    enemy.rect.bottom = collider.rect.top
+
             elif enemy.y_vel < 0:
                 enemy.rect.top = collider.rect.bottom
                 enemy.y_vel = 0
+
+    def handle_enemy_collision_with_player(self, enemy, vertical=False, horiz=True):
+        """
+        Handle collisions between enemy and player.
+        """
+        if self.player.state == c.BOUNCY:
+            if enemy.state == c.WALKING:
+                if random.randint(1,2) == 1:
+                    enemy.hit_by_player(self.dead_group1)
+                else:
+                    enemy.hit_by_player(self.dead_group2)
+        else:
+            if enemy.state == c.WALKING:
+                if vertical:
+                    self.player.rect.bottom = enemy.rect.top
+                    if self.player.rect.centerx < enemy.rect.centerx:
+                        self.player.damaged_by_enemy(c.LEFT)
+                        if enemy.direction == c.LEFT:
+                            enemy.x_vel *= -1
+                        enemy.direction = c.RIGHT
+                    elif self.player.rect.centerx >= enemy.rect.centerx:
+                        self.player.damaged_by_enemy(c.RIGHT)
+                        if enemy.direction == c.RIGHT:
+                            enemy.x_vel *= -1
+                        enemy.direction = c.LEFT
+                elif horiz:
+                    if self.player.rect.centerx < enemy.rect.centerx:
+                        self.player.rect.right = enemy.rect.left
+                        self.player.damaged_by_enemy(c.LEFT)
+                        if enemy.direction == c.LEFT:
+                            enemy.x_vel *= -1
+                        enemy.direction = c.RIGHT
+                    elif self.player.rect.centerx >= enemy.rect.centerx:
+                        self.player.rect.left = enemy.rect.right
+                        self.player.damaged_by_enemy(c.RIGHT)
+                        if enemy.direction == c.RIGHT:
+                            enemy.x_vel *= -1
+                        enemy.direction = c.LEFT
+
+
+
+
+
+
 
 
 

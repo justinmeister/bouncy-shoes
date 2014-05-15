@@ -25,14 +25,20 @@ class Level(tools._State):
         self.level_rect = self.level_surface.get_rect()
         self.player = self.make_player()
         self.sprites = self.make_sprites()
-        self.blockers = self.make_blockers()
+        self.blockers = self.make_blockers('blocker')
+        self.enemy_blockers = self.make_blockers('enemy blocker')
         self.item_boxes = self.make_item_boxes()
         self.stars = pg.sprite.Group()
+        self.dead_enemy_group1 = pg.sprite.Group()
+        self.dead_enemy_group2 = pg.sprite.Group()
         self.collision_handler = collision.CollisionHandler(self.player,
                                                             self.sprites,
                                                             self.blockers,
+                                                            self.enemy_blockers,
                                                             self.item_boxes,
-                                                            self.stars)
+                                                            self.stars,
+                                                            self.dead_enemy_group1,
+                                                            self.dead_enemy_group2)
         self.state_dict = self.make_state_dict()
 
     def make_viewport(self, map_image):
@@ -74,14 +80,14 @@ class Level(tools._State):
 
         return sprite_group
 
-    def make_blockers(self):
+    def make_blockers(self, blocker_name):
         """
         Make the collideable blockers the player can collide with.
         """
         blockers = pg.sprite.Group()
         for object in self.renderer.tmx_data.getObjects():
             properties = object.__dict__
-            if properties['name'] == 'blocker':
+            if properties['name'] == blocker_name:
                 x = properties['x']
                 y = properties['y'] - 70
                 width = height = 70
@@ -119,7 +125,9 @@ class Level(tools._State):
         """
         Update level normally.
         """
+        self.dead_enemy_group1.update(current_time, dt)
         self.player.update(keys, current_time, dt)
+        self.dead_enemy_group2.update(current_time, dt)
         self.sprites.update(current_time, dt)
         self.item_boxes.update(current_time)
         self.collision_handler.update(keys, current_time, dt)
@@ -146,7 +154,9 @@ class Level(tools._State):
         Blit all images to screen.
         """
         self.level_surface.blit(self.map_image, self.viewport, self.viewport)
+        self.dead_enemy_group1.draw(self.level_surface)
         self.level_surface.blit(self.player.image, self.player.rect)
+        self.dead_enemy_group2.draw(self.level_surface)
         self.sprites.draw(self.level_surface)
         self.stars.draw(self.level_surface)
         self.item_boxes.draw(self.level_surface)

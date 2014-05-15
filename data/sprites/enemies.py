@@ -14,11 +14,13 @@ class Enemy(pg.sprite.Sprite):
         self.walking_image_dict = self.make_walking_image_dict(name)
         self.direction = direction
         self.image_list = self.walking_image_dict[self.direction]
+        self.death_image_dict = self.make_death_image_dict()
         self.index = 0
         self.timer = 0.0
         self.image = self.image_list[self.index]
         self.x_vel = 0
         self.y_vel = 0
+        self.death_group = None
         self.rect = self.image.get_rect(x=x, bottom=y)
 
     def make_state_dict(self):
@@ -26,7 +28,9 @@ class Enemy(pg.sprite.Sprite):
         Make the dictionary for the enemy states.
         """
         state_dict = {c.WALKING: self.walking_state,
-                      c.FREE_FALL: self.free_fall_state}
+                      c.FREE_FALL: self.free_fall_state,
+                      c.IN_AIR: self.in_air_state,
+                      c.DEAD_ON_GROUND: self.dead_on_ground_state}
 
         return state_dict
 
@@ -45,6 +49,21 @@ class Enemy(pg.sprite.Sprite):
 
         image_dict = {c.RIGHT: right_image_list,
                       c.LEFT: left_image_list}
+
+        return image_dict
+
+    def make_death_image_dict(self):
+        """
+        Make a dictionary of images for when enemy is dead.
+        """
+        spritesheet = setup.GFX['enemy1death']
+        in_air_image = spritesheet.subsurface(pg.Rect(0, 4, 16, 20))
+        in_air_image = pg.transform.scale(in_air_image, (64, 80))
+        dead_image = spritesheet.subsurface(pg.Rect(16, 8, 22, 17))
+        dead_image = pg.transform.scale(dead_image, (88, 68))
+
+        image_dict = {c.IN_AIR: in_air_image,
+                      c.DEAD_ON_GROUND: dead_image}
 
         return image_dict
 
@@ -91,6 +110,31 @@ class Enemy(pg.sprite.Sprite):
         """
         self.state = c.FREE_FALL
         self.y_vel = 0
+
+    def hit_by_player(self, dead_group):
+        """
+        Enemy hit by player.
+        """
+        self.y_vel = -500
+        self.x_vel = -100
+        self.state = c.IN_AIR
+        self.death_group = dead_group
+
+    def in_air_state(self, *args):
+        self.image = self.death_image_dict[c.IN_AIR]
+
+    def dead_on_ground_state(self, *args):
+        self.image = self.death_image_dict[c.DEAD_ON_GROUND]
+
+    def enter_dead_on_ground_state(self):
+        self.state = c.DEAD_ON_GROUND
+        self.image = self.death_image_dict[c.DEAD_ON_GROUND]
+        self.rect = self.image.get_rect()
+        self.y_vel = 0
+        self.x_vel = 0
+        self.kill()
+        self.death_group.add(self)
+
 
 
 

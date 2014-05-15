@@ -49,3 +49,7 @@ BUMP_GRAVITY = 6000
 #ITEM STATES
 REVEAL = 'reveal'
 REVEALED = 'revealed'
+
+#ENEMY DEATH STATES
+IN_AIR = 'in air'
+DEAD_ON_GROUND = 'dead on ground'
