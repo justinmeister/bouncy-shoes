@@ -29,6 +29,7 @@ class Level(tools._State):
         self.enemy_blockers = self.make_blockers('enemy blocker')
         self.item_boxes = self.make_item_boxes()
         self.stars = pg.sprite.Group()
+        self.doors = self.make_doors()
         self.dead_enemy_group1 = pg.sprite.Group()
         self.dead_enemy_group2 = pg.sprite.Group()
         self.collision_handler = collision.CollisionHandler(self.player,
@@ -38,7 +39,9 @@ class Level(tools._State):
                                                             self.item_boxes,
                                                             self.stars,
                                                             self.dead_enemy_group1,
-                                                            self.dead_enemy_group2)
+                                                            self.dead_enemy_group2,
+                                                            self,
+                                                            self.doors)
         self.state_dict = self.make_state_dict()
 
     def make_viewport(self, map_image):
@@ -65,7 +68,7 @@ class Level(tools._State):
             if properties['name'] == 'player start point':
                 x = properties['x']
                 y = properties['y']
-                return player.Player(x, y)
+                return player.Player(x, y, self)
 
     def make_sprites(self):
         sprite_group = pg.sprite.Group()
@@ -80,6 +83,25 @@ class Level(tools._State):
 
         return sprite_group
 
+    def make_doors(self):
+        sprite_group = pg.sprite.Group()
+
+        for object in self.renderer.tmx_data.getObjects():
+            properties = object.__dict__
+            if properties['name'] == 'door':
+                name = properties['name']
+                x = properties['x']
+                y = properties['y']
+                sprite = pg.sprite.Sprite()
+                sprite.rect = pg.Rect(0, 0, 70, 70)
+                sprite.rect.x = x
+                sprite.rect.y = y
+                sprite.name = name
+                sprite_group.add(sprite)
+
+        return sprite_group
+
+
     def make_blockers(self, blocker_name):
         """
         Make the collideable blockers the player can collide with.
@@ -92,6 +114,7 @@ class Level(tools._State):
                 y = properties['y'] - 70
                 width = height = 70
                 blocker = pg.sprite.Sprite()
+                blocker.state = None
                 blocker.rect = pg.Rect(x, y, width, height)
                 blockers.add(blocker)
 
@@ -132,6 +155,7 @@ class Level(tools._State):
         self.item_boxes.update(current_time)
         self.collision_handler.update(keys, current_time, dt)
         self.viewport_update(dt)
+        self.delete_old_enemies()
         self.draw_level(surface)
 
     def update(self, surface, keys, current_time, dt):
@@ -146,30 +170,7 @@ class Level(tools._State):
         Update viewport so it stays centered on character,
         unless at edge of map.
         """
-        vertical_offset = self.viewport.centery - self.player.rect.centery
-        horiz_offset = self.viewport.centerx - self.player.rect.centerx * -1
-        third = self.viewport.width // 3
-        two_thirds = third * 2
-
-        if vertical_offset > 0:
-            self.viewport.y -= vertical_offset * .1
-        elif vertical_offset < 0:
-            self.viewport.y -= vertical_offset * .1
-
-        if self.player.direction == c.RIGHT:
-            if self.viewport.x < self.player.rect.centerx - third:
-                self.viewport.x += 15
-
-        elif self.player.direction == c.LEFT:
-            if self.viewport.x > (self.player.rect.centerx - two_thirds):
-                self.viewport.right -= 15
-
-
-
-
-
-
-        #self.viewport.centerx = self.player.rect.centerx
+        self.viewport.center = self.player.rect.center
         self.viewport.clamp_ip(self.level_rect)
 
     def draw_level(self, surface):
@@ -184,6 +185,15 @@ class Level(tools._State):
         self.stars.draw(self.level_surface)
         self.item_boxes.draw(self.level_surface)
         surface.blit(self.level_surface, (0, 0), self.viewport)
+
+    def delete_old_enemies(self):
+        for sprite in self.sprites:
+            if sprite.rect.x < (self.player.rect.x - 1000):
+                sprite.kill()
+
+    def end_game(self):
+        self.next = c.GAME_OVER
+        self.done = True
 
 
 

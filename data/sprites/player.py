@@ -12,7 +12,7 @@ class Player(pg.sprite.Sprite):
     """
     User controlled player.
     """
-    def __init__(self, x, y):
+    def __init__(self, x, y, level):
         super(Player, self).__init__()
         self.get_image = tools.get_image
         self.state_dict = self.make_state_dict()
@@ -33,6 +33,7 @@ class Player(pg.sprite.Sprite):
         self.damaged = False
         self.image = self.standing_image_dict[self.direction]
         self.rect = self.image.get_rect(x=x, bottom=y)
+        self.level_bottom = level.level_rect.bottom
 
     def make_state_dict(self):
         """
@@ -41,7 +42,8 @@ class Player(pg.sprite.Sprite):
         state_dict = {c.STANDING: self.standing,
                       c.WALKING: self.walking,
                       c.FREE_FALL: self.free_fall,
-                      c.BOUNCY: self.bouncing}
+                      c.BOUNCY: self.bouncing,
+                      c.AUTOWALK: self.auto_walk}
         return state_dict
 
     def standing(self, keys, current_time, dt):
@@ -176,6 +178,8 @@ class Player(pg.sprite.Sprite):
             tinted_image.fill((255, 0, 0, self.damage_alpha), special_flags=pg.BLEND_RGBA_MULT)
             self.image.blit(tinted_image, (0, 0))
             self.damage_alpha -= 5
+            if self.damage_alpha < 0:
+                self.damage_alpha = 0
 
 
     def make_walking_image_dict(self):
@@ -289,5 +293,17 @@ class Player(pg.sprite.Sprite):
         else:
             self.x_vel = 200
         self.y_vel = -700
+
+    def auto_walk(self, keys, current_time, dt):
+        self.image_list = self.walking_image_dict[self.direction]
+        self.image = self.image_list[self.index]
+        self.x_vel = 100
+        self.animate(current_time, dt)
+        self.direction = c.RIGHT
+
+        self.rect.x += self.x_vel * dt
+
+
+
 
 

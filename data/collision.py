@@ -14,17 +14,20 @@ class CollisionHandler(object):
     Handles collisions between the player, enemies and game
     objects.
     """
-    def __init__(self, player, sprites, blockers, enemy_blockers, item_boxes, stars, dead_group1, dead_group2):
+    def __init__(self, player, sprites, blockers, enemy_blockers, item_boxes, stars, dead_group1, dead_group2, level,
+                 doors):
         self.player = player
         self.sprites = sprites
         self.stars = stars
         self.blockers = blockers
         self.enemy_blockers = enemy_blockers
         self.item_boxes = item_boxes
+        self.doors = doors
         self.dead_group1 = dead_group1
         self.dead_group2 = dead_group2
         self.state_dict = self.make_state_dict()
         self.current_time = 0.0
+        self.level = level
 
     def make_state_dict(self):
         """
@@ -40,6 +43,7 @@ class CollisionHandler(object):
     def update(self, keys, current_time, dt):
         state_function = self.state_dict[self.player.state]
         state_function(keys, dt, current_time)
+        self.check_if_dead()
 
     def update_walking_player(self, keys, dt, current_time):
         """
@@ -74,7 +78,8 @@ class CollisionHandler(object):
         self.player.rect.y += self.player.y_vel * dt
         self.check_for_collision(True)
 
-        self.player.y_vel += c.GRAVITY * dt
+        if self.player.y_vel < c.MAX_FALL_SPEED:
+            self.player.y_vel += c.GRAVITY * dt
 
         self.adjust_item_box_position(dt)
         self.adjust_powerup_position(dt)
@@ -88,7 +93,8 @@ class CollisionHandler(object):
         blocker = pg.sprite.spritecollideany(self.player, self.blockers)
         item_box = pg.sprite.spritecollideany(self.player, self.item_boxes)
         bouncy_star = pg.sprite.spritecollideany(self.player, self.stars, tools.rect_than_mask)
-        enemy = pg.sprite.spritecollideany(self.player, self.sprites, tools.rect_than_mask)
+        enemy = pg.sprite.spritecollideany(self.player, self.sprites)
+        door = pg.sprite.spritecollideany(self.player, self.doors)
 
         if blocker and vertical:
             self.adjust_blocker_collision(self.player, blocker, True)
@@ -108,6 +114,9 @@ class CollisionHandler(object):
             self.handle_enemy_collision_with_player(enemy, True)
         elif enemy and horiz:
             self.handle_enemy_collision_with_player(enemy, False, True)
+
+        if door:
+            self.level.end_game()
 
     def adjust_blocker_collision(self, sprite, collider, vertical=False, horiz=False):
         """
@@ -202,20 +211,21 @@ class CollisionHandler(object):
         Adjust the position of each sprite based on velocity.
         """
         for sprite in self.sprites:
-            if not sprite.state == c.DEAD_ON_GROUND:
-                if sprite.state == c.FREE_FALL or sprite.state == c.IN_AIR:
-                    sprite.y_vel += c.GRAVITY * dt
-                if sprite.x_vel < 0:
-                    horiz_adjust = int(math.floor(sprite.x_vel * dt))
-                else:
-                    horiz_adjust = int(math.ceil(sprite.x_vel * dt))
+            if (self.player.rect.x - 475) <= sprite.rect.x <= (self.player.rect.x + 475):
+                if not sprite.state == c.DEAD_ON_GROUND:
+                    if sprite.state == c.FREE_FALL or sprite.state == c.IN_AIR:
+                        sprite.y_vel += c.GRAVITY * dt
+                    if sprite.x_vel < 0:
+                        horiz_adjust = int(math.floor(sprite.x_vel * dt))
+                    else:
+                        horiz_adjust = int(math.ceil(sprite.x_vel * dt))
 
-                sprite.rect.x += horiz_adjust
-                self.check_for_enemy_horiz_collision(sprite)
-                sprite.rect.y += sprite.y_vel * dt
-                self.check_for_enemy_vertical_collision(sprite)
-                if sprite.state == c.WALKING:
-                    self.check_for_ground(sprite)
+                    sprite.rect.x += horiz_adjust
+                    self.check_for_enemy_horiz_collision(sprite)
+                    sprite.rect.y += sprite.y_vel * dt
+                    self.check_for_enemy_vertical_collision(sprite)
+                    if sprite.state == c.WALKING:
+                        self.check_for_ground(sprite)
 
     def check_for_enemy_horiz_collision(self, enemy):
         collideable = pg.sprite.Group(self.blockers, self.item_boxes, self.enemy_blockers)
@@ -290,6 +300,16 @@ class CollisionHandler(object):
                         if enemy.direction == c.RIGHT:
                             enemy.x_vel *= -1
                         enemy.direction = c.LEFT
+
+    def check_if_dead(self):
+        if self.player.rect.y > self.player.level_bottom:
+            self.level.game_data[c.LIVES] -= 1
+            if self.level.game_data[c.LIVES] <= 0:
+                self.level.next = c.GAME_OVER
+            else:
+                self.level.next = c.LIVES_LEFT
+            self.level.done = True
+
 
 
 

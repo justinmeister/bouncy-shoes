@@ -159,13 +159,15 @@ def get_image(x, y, width, height, sprite_sheet):
     return image
 
 def create_game_data_dict():
-    return {}
+    return {c.LIVES: 3}
 
 def rect_than_mask(one, two):
     """
     Test for rect collision, followed by mask collision.
     """
+
     return pg.sprite.collide_rect(one, two) and pg.sprite.collide_mask(one, two)
+
 
 
 
