@@ -6,7 +6,7 @@ import random
 import pygame as pg
 from . import constants as c
 from .sprites import powerup
-from . import tools
+from . import tools, setup
 
 
 class CollisionHandler(object):
@@ -107,6 +107,7 @@ class CollisionHandler(object):
             self.adjust_blocker_collision(self.player, item_box, False, True)
 
         if bouncy_star:
+            setup.SFX['powerup'].play()
             bouncy_star.kill()
             self.player.enter_bouncy_state(self.current_time)
 
@@ -126,6 +127,7 @@ class CollisionHandler(object):
             if sprite.y_vel > 0:
                 sprite.rect.bottom = collider.rect.top
                 if sprite.state == c.BOUNCY:
+                    setup.SFX['enemykill'].play()
                     sprite.y_vel = c.START_JUMP_VEL
                 else:
                     sprite.enter_walking()
@@ -133,6 +135,7 @@ class CollisionHandler(object):
                 sprite.rect.top = collider.rect.bottom
                 sprite.y_vel = 0
                 if collider.state == c.NORMAL and collider.name == 'item box':
+                    setup.SFX['powerup'].play()
                     collider.enter_bump()
         if horiz:
             if sprite.x_vel > 0:
@@ -275,6 +278,7 @@ class CollisionHandler(object):
                     enemy.hit_by_player(self.dead_group2)
         else:
             if enemy.state == c.WALKING:
+                setup.SFX['hurt'].play()
                 if vertical:
                     self.player.rect.bottom = enemy.rect.top
                     if self.player.rect.centerx < enemy.rect.centerx:

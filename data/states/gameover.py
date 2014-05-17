@@ -15,7 +15,7 @@ class GameOver(tools._State):
         self.next = c.MAIN_MENU
         self.level_rect = setup.SCREEN.get_rect()
         text = 'GAME OVER'
-        self.font = pg.font.Font(setup.FONTS[c.MAIN_FONT], 60)
+        self.font = pg.font.Font(setup.FONTS['alienleague'], 60)
         self.rendered_text = self.font.render(text, 1, c.WHITE)
         location = self.level_rect.centerx, self.level_rect.y+150
         self.text_rect = self.rendered_text.get_rect(center=location)
@@ -40,4 +40,5 @@ class GameOver(tools._State):
             if event.type == pg.KEYUP:
                 self.game_data['last state'] = self.name
                 self.done = True
+                pg.mixer.music.stop()
 

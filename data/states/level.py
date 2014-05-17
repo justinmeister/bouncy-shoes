@@ -43,6 +43,11 @@ class Level(tools._State):
                                                             self,
                                                             self.doors)
         self.state_dict = self.make_state_dict()
+        self.main_theme = setup.MUSIC['main_theme']
+        if not pg.mixer.music.get_busy():
+            pg.mixer.music.load(self.main_theme)
+            pg.mixer.music.set_volume(0.4)
+            pg.mixer.music.play(-1)
 
     def make_viewport(self, map_image):
         """
@@ -170,7 +175,7 @@ class Level(tools._State):
         Update viewport so it stays centered on character,
         unless at edge of map.
         """
-        self.viewport.center = self.player.rect.center
+        self.viewport.center = self.player.rect.midbottom
         self.viewport.clamp_ip(self.level_rect)
 
     def draw_level(self, surface):

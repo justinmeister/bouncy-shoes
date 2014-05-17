@@ -41,3 +41,4 @@ class Controls(tools._State):
         if event.type == pg.KEYUP:
             self.game_data['last state'] = self.name
             self.done = True
+            pg.mixer.music.stop()

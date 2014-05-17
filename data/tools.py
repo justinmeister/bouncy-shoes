@@ -3,6 +3,8 @@ import os
 import pygame as pg
 from . import constants as c
 
+
+
 class Control(object):
     """
     Control class for entire project. Contains the game loop and contains
