@@ -13,6 +13,10 @@ Video Demo:
 
 https://www.youtube.com/watch?v=EeYX6qqbqT4
 
+PyWeek Entry:
+
+https://pyweek.org/e/Justinmeister/
+
 Requires Pygame 1.9.1.
 
 To Run: python run_game.py
