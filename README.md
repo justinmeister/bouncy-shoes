@@ -9,6 +9,12 @@ Artwork and music by Kenney (www.kenney.nl)
 
 ![screenshot](https://raw.githubusercontent.com/justinmeister/bouncy-shoes/master/sreenshot.png)
 
+Video Demo: 
+
+https://www.youtube.com/watch?v=EeYX6qqbqT4
+
 Requires Pygame 1.9.1.
 
 To Run: python run_game.py
+
+
